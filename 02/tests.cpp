@@ -130,7 +130,7 @@ void differentSpaces()
     digit_test.clear();
     string_test.clear();
 
-    // пробелы в начале текста и 
+    // пробелы в начале текста
     std::string test9 = "\t  21";
     digit_true = {21};
     string_true = {};
@@ -194,10 +194,44 @@ void someStringsAndDigits()
     assert(string_test == string_true);
 }
 
+//тест на экстремальные случаи
+void extraTest()
+{
+    parse::TokenParser parser;
+    std::vector<uint64_t> digit_test, digit_true;
+    std::vector<std::string> string_test, string_true;
+    parser.SetDigitTokenCallback(std::bind(digitCallback, std::placeholders::_1, std::ref(digit_test)));
+    parser.SetStringTokenCallback(std::bind(stringCallback, std::placeholders::_1, std::ref(string_test)));
+
+    // пустая строка
+    std::string test14;
+    digit_true = {};
+    string_true = {};
+    parser.Parse(test14);
+    assert(digit_test == digit_true && string_test == string_true);
+
+    // строки минимальной длины
+    std::string test15 = "1";
+    digit_true = {1};
+    string_true = {};
+    parser.Parse(test15);
+    assert(digit_test == digit_true && string_test == string_true);
+
+    digit_test.clear();
+
+    // строки минимальной длины
+    std::string test16 = "a";
+    digit_true = {};
+    string_true = {"a"};
+    parser.Parse(test16);
+    assert(digit_test == digit_true && string_test == string_true);
+}
+
 int main()
 {
     defaultUse();
     partialSetCallbacks();
     differentSpaces();
     someStringsAndDigits();
+    extraTest();
 }
