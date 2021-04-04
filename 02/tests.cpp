@@ -204,26 +204,26 @@ void extraTest()
     parser.SetStringTokenCallback(std::bind(stringCallback, std::placeholders::_1, std::ref(string_test)));
 
     // пустая строка
-    std::string test14;
+    std::string test15;
     digit_true = {};
-    string_true = {};
-    parser.Parse(test14);
-    assert(digit_test == digit_true && string_test == string_true);
-
-    // строки минимальной длины
-    std::string test15 = "1";
-    digit_true = {1};
     string_true = {};
     parser.Parse(test15);
     assert(digit_test == digit_true && string_test == string_true);
 
+    // строка минимальной длины - число
+    std::string test16 = "1";
+    digit_true = {1};
+    string_true = {};
+    parser.Parse(test16);
+    assert(digit_test == digit_true && string_test == string_true);
+
     digit_test.clear();
 
-    // строки минимальной длины
-    std::string test16 = "a";
+    // строка минимальной длины - строка
+    std::string test17 = "a";
     digit_true = {};
     string_true = {"a"};
-    parser.Parse(test16);
+    parser.Parse(test17);
     assert(digit_test == digit_true && string_test == string_true);
 }
 
