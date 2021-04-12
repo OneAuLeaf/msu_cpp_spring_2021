@@ -1,5 +1,5 @@
 CC = g++
-FLAGS = -Wall -Werror -std=c++17 -fsanitize=address
+FLAGS = -Wall -Werror -Wno-unused-comparison -Wno-self-assign-overloaded -std=c++17 -fsanitize=address
 
 all: matrix
 
