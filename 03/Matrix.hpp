@@ -25,6 +25,8 @@ public:
     Matrix(size_t rows, size_t columns);
     Matrix(const Matrix& other);
     Matrix& operator= (const Matrix& other);
+    Matrix(Matrix&& other);
+    Matrix& operator= (Matrix&& other);
 
     size_t getRows() const { return rows_; }
     size_t getColumns() const { return columns_; }

@@ -60,6 +60,27 @@ Matrix& Matrix::operator= (const Matrix& other)
     return *this;
 }
 
+Matrix::Matrix(Matrix&& other) : rows_{other.rows_}, columns_{other.columns_}, data_{other.data_}
+{
+    other.rows_ = 0;
+    other.columns_ = 0;
+    other.data_ = nullptr;
+}
+
+Matrix& Matrix::operator= (Matrix&& other)
+{
+    if (this != &other) {
+        delete [] data_;
+        rows_ = other.rows_;
+        columns_ = other.columns_;
+        data_ = other.data_;
+        other.rows_ = 0;
+        other.columns_ = 0;
+        other.data_ = nullptr;
+    }
+    return *this;
+}
+
 Matrix::~Matrix()
 {
     delete [] data_;
@@ -141,5 +162,6 @@ bool operator!=(const Matrix& mat1, const Matrix& mat2)
 
 Matrix operator+ (Matrix mat1, const Matrix& mat2)
 {
-    return mat1 += mat2;
+    mat1 += mat2;
+    return mat1;
 }
