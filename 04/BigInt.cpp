@@ -106,7 +106,7 @@ BigInt::BigInt(BigInt&& other) : size_{other.size_}, sign_{other.sign_}, data_{o
 {
     other.size_ = 0;
     other.sign_ = 0;
-    other.data_ = nullptr;
+    other.data_ = new int32_t[0];
 }
 
 BigInt& BigInt::operator= (BigInt&& other)
@@ -120,7 +120,7 @@ BigInt& BigInt::operator= (BigInt&& other)
 
         other.size_ = 0;
         other.sign_ = 0;
-        other.data_ = nullptr;
+        other.data_ = new int32_t[0];
     }
 
     return *this;
@@ -155,7 +155,10 @@ BigInt& BigInt::operator+=(const BigInt& other)
     reallocate(new_size);
     int32_t carry  = 0;
     for (size_t i = 0; i < other.size_ || carry; ++i) {
-        int32_t res = data_[i] + (i < other.size_ ? other.data_[i] : 0) + carry;
+        int32_t res = data_[i] + carry;
+        if (i < other.size_) {
+            res += other.data_[i];
+        }
         data_[i] = res % mod;
         carry = res / mod;
     }
@@ -206,10 +209,13 @@ BigInt& BigInt::operator*=(const BigInt& other)
     for (size_t i = 0; i < new_size; ++i) {
         new_data[i] = 0;
     }
-    int32_t carry = 0;
     for (size_t i = 0; i < size_; ++i) {
+        int32_t carry = 0;
         for (size_t j = 0; j < other.size_ || carry; ++j) {
-            int64_t res = new_data[i + j] + ((int64_t) data_[i]) * (j < other.size_ ? other.data_[j] : 0) + carry;
+            int64_t res = new_data[i + j] + carry;
+            if (j < other.size_) {
+                res += ((int64_t) data_[i]) * other.data_[j];
+            }
             new_data[i + j] = res % mod;
             carry = res / mod;
         }
@@ -231,41 +237,43 @@ std::ostream& operator<<(std::ostream& out, const BigInt& num)
     if (num.sign_ < 0) {
         out << '-';
     }
-    out << num.data_[num.size_ - 1];
-    std::streamsize prev_width = out.width(num.base);
-    char prev_fiil = out.fill('0');
-    if (num.size_ > 1) {
-        for (size_t i = num.size_ - 2; i; --i) {
-            out << num.data_[i];
-        }
-        out << num.data_[0];
+    std::streamsize prev_width = out.width();
+    char prev_fiil = out.fill();
+    for (size_t i = num.size_ - 1; i; --i) {
+        out << num.data_[i];
+        out.width(num.base);
+        out.fill('0');
     }
+    out << num.data_[0];
     out.width(prev_width);
     out.fill(prev_fiil);
     return out;
 }
 
-BigInt operator+ (BigInt num1, const BigInt& num2)
+BigInt operator+ (const BigInt& num1, const BigInt& num2)
 {
-    num1 += num2;
-    return num1;
+    BigInt res = num1;
+    res += num2;
+    return res;
 }
 
-BigInt operator- (BigInt num1, const BigInt& num2)
+BigInt operator- (const BigInt& num1, const BigInt& num2)
 {
-    num1 -= num2;
-    return num1;
+    BigInt res = num1;
+    res -= num2;
+    return res;
 }
 
-BigInt operator* (BigInt num1, const BigInt& num2)
+BigInt operator* (const BigInt& num1, const BigInt& num2)
 {
-    num1 *= num2;
-    return num1;
+    BigInt res = num1;
+    res *= num2;
+    return res;
 }
 
 bool operator==(const BigInt& num1, const BigInt& num2)
 {
-    if (!num1.sign_) {
+    if (!num1.sign_ && !num2.sign_) {
         return true;
     }
     if (num1.sign_ != num2.sign_ || num1.size_ != num2.size_) {
@@ -300,7 +308,7 @@ bool operator<(const BigInt& num1, const BigInt& num2)
         return false;
     }
     size_t i = num1.size_ - 1;
-    while (i && num1.data_[i] != num2.data_[i]) {
+    while (i && num1.data_[i] == num2.data_[i]) {
         --i;
     }
     if (num1.sign_ > 0) {

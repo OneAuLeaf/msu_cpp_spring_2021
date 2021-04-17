@@ -25,9 +25,9 @@ public:
     BigInt& operator-=(const BigInt&);
     BigInt& operator*=(const BigInt&);
     
-    friend BigInt operator+ (BigInt, const BigInt&);
-    friend BigInt operator- (BigInt, const BigInt&);
-    friend BigInt operator* (BigInt, const BigInt&);
+    friend BigInt operator+ (const BigInt&, const BigInt&);
+    friend BigInt operator- (const BigInt&, const BigInt&);
+    friend BigInt operator* (const BigInt&, const BigInt&);
     
     friend bool operator==(const BigInt&, const BigInt&);
     friend bool operator!=(const BigInt&, const BigInt&);
