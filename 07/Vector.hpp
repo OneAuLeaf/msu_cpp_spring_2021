@@ -13,6 +13,8 @@ class Vector
 public:
     using value_type = T;
     using allocator_type = AllocatorT;
+    using size_type = size_t;
+    using difference_type  = ptrdiff_t;
     using reference = value_type&;
     using const_reference = const value_type&;
     using pointer = typename std::allocator_traits<AllocatorT>::pointer;
@@ -23,14 +25,16 @@ public:
     using const_reverse_iterator = typename std::reverse_iterator<const_iterator>;
 
     Vector();
-    explicit Vector(AllocatorT& alloc);
-    explicit Vector(size_t size, AllocatorT& alloc =AllocatorT());
-    explicit Vector(size_t size, const T& value, AllocatorT& alloc =AllocatorT());
-    template <class InputIt>
-    Vector(InputIt first, InputIt last, AllocatorT& alloc = AllocatorT());
-    Vector(std::initializer_list<T> init, AllocatorT& alloc=AllocatorT());
+    explicit Vector(const AllocatorT& alloc);
+    explicit Vector(size_t size, const AllocatorT& alloc = AllocatorT());
+    Vector(size_t size, const T& value, const AllocatorT& alloc = AllocatorT());
+    template <class InputIt, class = typename std::iterator_traits<InputIt>::value_type>
+    Vector(InputIt first, InputIt last, const AllocatorT& alloc = AllocatorT());
+    Vector(std::initializer_list<T> init, const AllocatorT& alloc = AllocatorT());
+
     Vector(const Vector& other);
     Vector(Vector&& other);
+
     Vector& operator=(const Vector& other);
     Vector& operator=(Vector&& other);
     Vector& operator=(std::initializer_list<T> init);
@@ -65,7 +69,7 @@ public:
     ~Vector();
 private:
     size_t size_, capacity_;
-    AllocatorT& allocator_;
+    AllocatorT allocator_;
     T* data_;
 };
 

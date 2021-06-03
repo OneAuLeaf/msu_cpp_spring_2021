@@ -5,25 +5,39 @@
 
 template <class T>
 class Iterator
-    : public std::iterator<std::random_access_iterator_tag, T>
 {
 public:
-    explicit Iterator(T* ptr) : ptr_(ptr) {}
+    using iterator_category = std::random_access_iterator_tag;
+    using value_type = T;
+    using difference_type = ptrdiff_t;
+    using pointer = T*;
+    using reference = T&;
 
-    T& operator*() { return *ptr_; }
-    T& operator[](size_t i) { return ptr_[i]; }
+    explicit Iterator(pointer ptr) : ptr_(ptr) {}
+
+    Iterator(const Iterator&) = default;
+    Iterator(Iterator&&) = default;
+    Iterator& operator=(const Iterator&) = default;
+    Iterator& operator=(Iterator&&) = default;
+
+    reference operator*() const { return *ptr_; }
+    pointer operator->() const { return ptr_; }
+    reference operator[](size_t i) const { return ptr_[i]; }
     
     Iterator& operator++() { ++ptr_; return *this; }
     Iterator operator++(int) { Iterator retval = *this; ++(*this); return retval; }
     Iterator& operator--() { --ptr_; return *this; }
     Iterator operator--(int) { Iterator retval = *this; --(*this); return retval; }
 
-    Iterator& operator+=(ptrdiff_t n) { ptr_ += n; return *this; }
-    Iterator operator+ (ptrdiff_t n) const { Iterator tmp = *this; return tmp += n;}
-    Iterator& operator-=(ptrdiff_t n) { ptr_ -= n; return *this; }
-    Iterator operator- (ptrdiff_t n) const { Iterator tmp = *this; return tmp -= n;}
+    Iterator& operator+=(difference_type n) { ptr_ += n; return *this; }
+    Iterator operator+ (difference_type n) const { Iterator tmp = *this; return tmp += n;}
+    
+    friend Iterator operator+(difference_type n, const Iterator& self) { Iterator tmp = self; return tmp + n; }
 
-    ptrdiff_t operator-(const Iterator& other) const { return std::distance(ptr_, other.ptr_); }
+    Iterator& operator-=(difference_type n) { ptr_ -= n; return *this; }
+    Iterator operator- (difference_type n) const { Iterator tmp = *this; return tmp -= n;}
+
+    difference_type operator-(const Iterator& other) const { return std::distance(other.ptr_, ptr_); }
 
     bool operator==(const Iterator& other) const { return ptr_ == other.ptr_; }
     bool operator!=(const Iterator& other) const { return !(*this == other); }
@@ -32,7 +46,7 @@ public:
     bool operator<=(const Iterator& other) const { return !(other < *this); }
     bool operator>=(const Iterator& other) const { return !(*this < other); }
 private:
-    T* ptr_;
+    pointer ptr_;
 };
 
 #endif

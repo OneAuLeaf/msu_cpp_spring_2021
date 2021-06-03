@@ -9,7 +9,7 @@ test: vector
 vector: tests.o
 	${CC} ${FLAGS} -o $@ $^
 
-tests.o: tests.cpp Vector.hpp
+tests.o: tests.cpp Vector.hpp Vector.tpp Allocator.hpp Iterator.hpp
 	${CC} ${FLAGS} -c -o $@ $<
 
 clean:
